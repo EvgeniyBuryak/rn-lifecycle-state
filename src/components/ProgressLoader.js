@@ -1,28 +1,42 @@
-import React, { useState } from 'react';
+import React, { Component } from 'react';
 import { View, StyleSheet } from 'react-native';
 import RNProgressLoader from 'rn-progress-loader';
 
-let isVisible, setVisible = null;
+class ProgressLoader extends Component {
 
-const componentDidMount = () => {
-    [isVisible, setVisible] = useState(false);
-    console.log(isVisible);
-    setInterval(() => {
-        setVisible(true);
-    }, 5000);
-};
+    constructor(props) {
+        super(props);
+        this.state = {
+            visible: true
+        };
+    }
 
-const ProgressLoader = () => {
-    console.log(isVisible);
-    return <View style={styles.loader}>
-        <RNProgressLoader
-            visible={isVisible}
-            isModal={true} isHUD={true}
-            hudColor={"#000000"}
-            color={"#FFFFFF"}
-        />
-    </View>
-};
+    componentDidMount() {
+        this.timeOut = setTimeout(() => {
+            this.setState({
+                visible: !this.state.visible
+            });
+        }, 5000);        
+    }
+
+    componentWillUnmoun() {
+        clearTimeout(this.timeOut);
+    }
+
+    render() {
+        return (
+            <View style={styles.loader}>
+            
+            <RNProgressLoader
+                visible={this.state.visible}
+                isModal={true} isHUD={true}
+                hudColor={"#000000"}
+                color={"#FFFFFF"}
+            />
+            </View>
+        )
+    }
+}
 
 const styles = StyleSheet.create({
     loader: {
