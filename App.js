@@ -3,7 +3,19 @@ import React, { Component } from 'react';
 import { StyleSheet, Text, TextInput, View, FlatList, ActivityIndicator } from 'react-native';
 import ProgressLoader from './src/components/ProgressLoader';
 
+const axios = require('axios');
+
+// resourse - имя запрашиваемого ресурса
+// id - опциональный идентификатор ресурса
+axios.get('https://api.zp.ru/v1/vacancies/?geo_id=1219&limit=10', {
+}).then((response) => {
+    console.log(response);
+}).catch((error) => {
+    console.log(error);
+});
+
 const listVacancies = ["Водитель", "Пожарный", "Швея", "Подорожник"];
+
 
 class App extends Component {
 
@@ -24,7 +36,7 @@ class App extends Component {
     return (
     <View style={styles.container}>
         <ProgressLoader />
-            <Text style={{fontSize: 22}}>Список вакансий:</Text>
+        <Text style={{fontSize: 22}}>Список вакансий:</Text>
         <FlatList
         keyExtractor={(item) => item}
         data={this.state.vacancy}
