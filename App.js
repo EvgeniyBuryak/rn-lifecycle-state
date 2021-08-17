@@ -4,17 +4,27 @@ import { StyleSheet, Text, TextInput, View, FlatList, ActivityIndicator } from '
 import ProgressLoader from './src/components/ProgressLoader';
 
 const axios = require('axios');
+const listVacancies = [];
 
 // resourse - имя запрашиваемого ресурса
 // id - опциональный идентификатор ресурса
-axios.get('https://api.zp.ru/v1/vacancies/?geo_id=1219&limit=10', {
-}).then((response) => {
-    console.log(response);
+axios.get('https://api.zp.ru/v1/vacancies/?geo_id=826&limit=5'
+).then((response) => { // id nsk = 826
+    response.data.vacancies.forEach((vacancy) => {
+
+        const vacancyHeader = vacancy.header;        
+        const titleCity = vacancy.address.city.title;
+
+        //console.log(`Вакансия: ${typeof vacancyHeader} в городе  ${titleCity}`);
+
+        listVacancies.push(vacancyHeader);
+        console.log(listVacancies);
+    });
 }).catch((error) => {
     console.log(error);
 });
 
-const listVacancies = ["Водитель", "Пожарный", "Швея", "Подорожник"];
+//const listVacancies = ["Водитель", "Пожарный", "Швея", "Подорожник"];
 
 
 class App extends Component {
@@ -22,13 +32,13 @@ class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            vacancy: []
+            vacancy: [...listVacancies]
         };
     }
 
     componentDidMount() {
         this.setState({
-            vacancy: [...listVacancies, "Разработчик"]
+            vacancy: [...listVacancies,]
         });
     }
 
