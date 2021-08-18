@@ -1,7 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { Component } from 'react';
-import { StyleSheet, Text, TextInput, View, FlatList, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, TextInput, View, FlatList, ActivityIndicator, Button } from 'react-native';
 import ProgressLoader from './src/components/ProgressLoader';
+import Toast, { DURATION } from 'react-native-easy-toast';
 
 // resourse - имя запрашиваемого ресурса
 // id - опциональный идентификатор ресурса
@@ -53,12 +54,13 @@ class App extends Component {
                     vacancy: [this.state.vacancy, ...result],
                     onLoader: false
                 });
+                this.toast.show('Вакансии успешно загружены', 2000);
             }
         });
     }
 
     componentWillUnmount() {
-        //this.promiseArray = null;
+        this.toast = null;
         console.log("The end!");
     }
 
@@ -69,7 +71,10 @@ class App extends Component {
         //console.log(`onLoader in render: ${this.state.onLoader}`);
         //<ProgressLoader onLoader={this.state.isLoader} />
         return (
-            <View style={styles.container}>                
+            <View style={styles.container}>
+                <Toast ref={(toast) => this.toast = toast}
+                    position='top'
+                />
                 <ActivityIndicator
                     size="large"
                     color="#0000ff"
