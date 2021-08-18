@@ -11,7 +11,7 @@ async function getVacancy() {
     const array = [];
 
     try {
-        const response = await axios.get('https://api.zp.ru/v1/vacancies/?geo_id=826&limit=10'
+        const response = await axios.get('https://api.zp.ru/v1/vacancies/?geo_id=826&limit=50'
         );
         
         response.data.vacancies.forEach((vacancy) => {
@@ -37,8 +37,8 @@ class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            vacancy: new Promise((resolve, reject) => { }),
-            //loader: true 
+            vacancy: [],//new Promise((resolve, reject) => { }),  
+            onLoader: true 
         };
     }
 
@@ -50,24 +50,33 @@ class App extends Component {
 
             if (Array.isArray(result) && result.length) {
                 this.setState({
-                    vacancy: result,
+                    vacancy: [this.state.vacancy, ...result],
+                    onLoader: false
                 });
             }
         });
     }
 
     componentWillUnmount() {
-        this.arrVacancies = null;
+        //this.promiseArray = null;
+        console.log("The end!");
     }
 
     render() {
 
-        //console.log(`Render: ${typeof this.state.vacancy}`);
-
+        console.log("Load Render");
+        //console.log(`Render: ${this.state.vacancy}`);
+        //console.log(`onLoader in render: ${this.state.onLoader}`);
+        //<ProgressLoader onLoader={this.state.isLoader} />
         return (
-            <View style={styles.container}>
-                
-                <Text style={{ fontSize: 22 }}>Вакансий:</Text>
+            <View style={styles.container}>                
+                <ActivityIndicator
+                    size="large"
+                    color="#0000ff"
+                    animating={this.state.onLoader}
+                    hidesWhenStopped={true}
+                />
+                <Text style={{ fontSize: 22 }}>Вакансии:</Text>
                 <FlatList
                     keyExtractor={(item) => item}
                     data={this.state.vacancy}
