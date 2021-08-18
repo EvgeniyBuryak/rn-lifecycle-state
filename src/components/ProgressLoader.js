@@ -7,16 +7,17 @@ class ProgressLoader extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            visible: true
+            visible: true,
         };
     }
 
     componentDidMount() {
         this.timeOut = setTimeout(() => {
+
             this.setState({
                 visible: !this.state.visible
             });
-        }, 5000);        
+        }, 5000);
     }
 
     componentWillUnmoun() {
@@ -24,6 +25,9 @@ class ProgressLoader extends Component {
     }
 
     render() {
+
+        //console.log(`visible in ProgressLoader: ${this.state.visible}`);
+
         return (
             <View style={styles.loader}>
             
