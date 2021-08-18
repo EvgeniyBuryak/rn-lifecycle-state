@@ -3,64 +3,85 @@ import React, { Component } from 'react';
 import { StyleSheet, Text, TextInput, View, FlatList, ActivityIndicator } from 'react-native';
 import ProgressLoader from './src/components/ProgressLoader';
 
-const axios = require('axios');
-const listVacancies = [];
-
 // resourse - имя запрашиваемого ресурса
 // id - опциональный идентификатор ресурса
-axios.get('https://api.zp.ru/v1/vacancies/?geo_id=826&limit=5'
-).then((response) => { // id nsk = 826
-    response.data.vacancies.forEach((vacancy) => {
+async function getVacancy() {
 
-        const vacancyHeader = vacancy.header;        
-        const titleCity = vacancy.address.city.title;
+    const axios = require('axios');
+    const array = [];
 
-        //console.log(`Вакансия: ${typeof vacancyHeader} в городе  ${titleCity}`);
+    try {
+        const response = await axios.get('https://api.zp.ru/v1/vacancies/?geo_id=826&limit=10'
+        );
+        
+        response.data.vacancies.forEach((vacancy) => {
 
-        listVacancies.push(vacancyHeader);
-        console.log(listVacancies);
-    });
-}).catch((error) => {
-    console.log(error);
-});
+            const vacancyHeader = vacancy.header;
+            const titleCity = vacancy.address.city.title;
 
-//const listVacancies = ["Водитель", "Пожарный", "Швея", "Подорожник"];
+            if (!array.includes(vacancyHeader)) {
 
+                array.push(vacancyHeader);
+            }
+        });
+    } catch (error) {
+        console.log(error);
+    }
+
+    console.log(`In promise: ${Array.isArray(array) }`);
+    return array;
+}
 
 class App extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            vacancy: [...listVacancies]
+            vacancy: new Promise((resolve, reject) => { }),
+            //loader: true 
         };
     }
 
     componentDidMount() {
-        this.setState({
-            vacancy: [...listVacancies,]
+        const promiseArray = getVacancy();
+
+        promiseArray.then(result => {
+            console.log(`What this: ${Array.isArray(result)}`);
+
+            if (Array.isArray(result) && result.length) {
+                this.setState({
+                    vacancy: result,
+                });
+            }
         });
     }
 
+    componentWillUnmount() {
+        this.arrVacancies = null;
+    }
+
     render() {
-    return (
-    <View style={styles.container}>
-        <ProgressLoader />
-        <Text style={{fontSize: 22}}>Список вакансий:</Text>
-        <FlatList
-        keyExtractor={(item) => item}
-        data={this.state.vacancy}
-        renderItem={({ item }) => {
-        return <View>
-            <Text
-                style={styles.titleSize}>Вакансия: {item}
-            </Text>
+
+        //console.log(`Render: ${typeof this.state.vacancy}`);
+
+        return (
+            <View style={styles.container}>
+                
+                <Text style={{ fontSize: 22 }}>Вакансий:</Text>
+                <FlatList
+                    keyExtractor={(item) => item}
+                    data={this.state.vacancy}
+                    renderItem={({ item }) => {
+                        return <View>
+                            <Text style={styles.titleSize}>
+                                {item}
+                            </Text>
+                        </View>
+                    }}
+                />
+                <StatusBar style="auto" />
             </View>
-        }}
-        />
-        <StatusBar style="auto" />
-    </View>
-    )
+        )
     }
 }
 
@@ -74,6 +95,7 @@ const styles = StyleSheet.create({
     },
     titleSize: {
         fontSize: 20,
+        margin: 5,
     }
 });
 
