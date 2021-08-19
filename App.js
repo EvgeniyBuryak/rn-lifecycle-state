@@ -50,12 +50,16 @@ class App extends Component {
             console.log(`What this: ${Array.isArray(result)}`);
 
             if (Array.isArray(result) && result.length) {
+
                 this.setState({
                     vacancy: [this.state.vacancy, ...result],
                     onLoader: false
                 });
+
                 this.toast.show('Вакансии успешно загружены', 2000);
             }
+        }).catch((error) => {
+            this.toast.show('Ошибка загрузки вакансии', 2000)
         });
     }
 
