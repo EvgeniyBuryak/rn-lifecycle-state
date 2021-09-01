@@ -1,107 +1,79 @@
-import { StatusBar } from 'expo-status-bar';
-import React, { Component } from 'react';
+//import { StatusBar } from 'expo-status-bar';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, TextInput, View, FlatList, ActivityIndicator, Button } from 'react-native';
-import ProgressLoader from './src/components/ProgressLoader';
+//import ProgressLoader from './src/components/ProgressLoader';   
 import Toast, { DURATION } from 'react-native-easy-toast';
+import zpRu from './src/api/zarplataRu';
 
-// resourse - имя запрашиваемого ресурса
-// id - опциональный идентификатор ресурса
-async function getVacancy() {
+const App = () => {
+    //const [vacancy, setVacancy] = useState([]);
+    const [onLoader, setOnLoader] = useState(true);
 
-    const axios = require('axios');
-    const array = [];
+    const [results, setResults] = useState([]);
+    const vacancyApi = async () => {
+        setOnLoader(true);
 
-    try {
-        const response = await axios.get('https://api.zp.ru/v1/vacancies/?geo_id=826&limit=50'
-        );
-        
-        response.data.vacancies.forEach((vacancy) => {
+        try {
+            const response = await zpRu.get('/', {
+                params: {
+                    limit: 5,
+                    geo_id: 826
+                }
+            });
 
-            const vacancyHeader = vacancy.header;
-            const titleCity = vacancy.address.city.title;
+            const vacancies = response.data.vacancies;
 
-            if (!array.includes(vacancyHeader)) {
+            vacancies.forEach((vacancy) => {
+                //if (vacancy.header
+                    setResults([vacancy.header, ...results]);
+            });
 
-                array.push(vacancyHeader);
-            }
-        });
-    } catch (error) {
-        console.log(error);
+            _toast.show('Вакансии успешно загружены', 2000);
+
+        } catch (error) {
+            _toast.show('Ошибка загрузки вакансии', 2000);
+        } finally {
+            setOnLoader(false);
+        }        
     }
 
-    console.log(`In promise: ${Array.isArray(array) }`);
-    return array;
-}
+    useEffect(() => {
+        // Hook useEffect постоянно обновляется
+        /*vacancyApi();
+        return () => {
+            setResults([]);
+        };*/
+    });
+    
+    return (
+        <View style={styles.container}>
+            <Button title={'Press me'} onPress={vacancyApi} />
+            <Toast ref={(toast) => _toast = toast}
+                position='top'
+            />
+            <ActivityIndicator
+                size="large"
+                color="#0000ff"
+                animating={onLoader}
+                hidesWhenStopped={true}
+            />
+            <Text style={{ fontSize: 22 }}>Вакансии:</Text>
+            <FlatList
+                keyExtractor={(item) => item}
+                data={results}
+                renderItem={({ item }) => {
+                    return <View>
+                        <Text style={styles.titleSize}>
+                            {item}
+                        </Text>
+                    </View>
+                }}
+            />            
+        </View>
+    );
+};
 
-class App extends Component {
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            vacancy: [],//new Promise((resolve, reject) => { }),  
-            onLoader: true 
-        };
-    }
-
-    componentDidMount() {
-        const promiseArray = getVacancy();
-
-        promiseArray.then(result => {
-            console.log(`What this: ${Array.isArray(result)}`);
-
-            if (Array.isArray(result) && result.length) {
-
-                this.setState({
-                    vacancy: [this.state.vacancy, ...result],
-                    onLoader: false
-                });
-
-                this.toast.show('Вакансии успешно загружены', 2000);
-            }
-        }).catch((error) => {
-            this.toast.show('Ошибка загрузки вакансии', 2000)
-        });
-    }
-
-    componentWillUnmount() {
-        this.toast = null;
-        console.log("The end!");
-    }
-
-    render() {
-
-        console.log("Load Render");
-        //console.log(`Render: ${this.state.vacancy}`);
-        //console.log(`onLoader in render: ${this.state.onLoader}`);
-        //<ProgressLoader onLoader={this.state.isLoader} />
-        return (
-            <View style={styles.container}>
-                <Toast ref={(toast) => this.toast = toast}
-                    position='top'
-                />
-                <ActivityIndicator
-                    size="large"
-                    color="#0000ff"
-                    animating={this.state.onLoader}
-                    hidesWhenStopped={true}
-                />
-                <Text style={{ fontSize: 22 }}>Вакансии:</Text>
-                <FlatList
-                    keyExtractor={(item) => item}
-                    data={this.state.vacancy}
-                    renderItem={({ item }) => {
-                        return <View>
-                            <Text style={styles.titleSize}>
-                                {item}
-                            </Text>
-                        </View>
-                    }}
-                />
-                <StatusBar style="auto" />
-            </View>
-        )
-    }
-}
+//<StatusBar style="auto" />
 
 const styles = StyleSheet.create({
     container: {
