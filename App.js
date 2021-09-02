@@ -1,50 +1,18 @@
-//import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, TextInput, View, FlatList, ActivityIndicator, Button } from 'react-native';
-//import ProgressLoader from './src/components/ProgressLoader';   
 import Toast, { DURATION } from 'react-native-easy-toast';
-import zpRu from './src/api/zarplataRu';
+import useResults from './src/hooks/useResults';
 
-const App = () => {
-    //const [vacancy, setVacancy] = useState([]);
-    const [onLoader, setOnLoader] = useState(true);
+global._toast = '';
 
-    const [results, setResults] = useState([]);
-    const vacancyApi = async () => {
-        setOnLoader(true);
-
-        try {
-            const response = await zpRu.get('/', {
-                params: {
-                    limit: 5,
-                    geo_id: 826
-                }
-            });
-
-            const vacancies = response.data.vacancies;
-
-            vacancies.forEach((vacancy) => {
-                //if (vacancy.header
-                    setResults([vacancy.header, ...results]);
-            });
-
-            _toast.show('Вакансии успешно загружены', 2000);
-
-        } catch (error) {
-            _toast.show('Ошибка загрузки вакансии', 2000);
-        } finally {
-            setOnLoader(false);
-        }        
-    }
+const App = () => {    
+    const [vacancyApi, results, onLoader, errorMessage] = useResults();
 
     useEffect(() => {
-        // Hook useEffect постоянно обновляется
-        /*vacancyApi();
-        return () => {
-            setResults([]);
-        };*/
-    });
-    
+        console.log(results);
+        _toast.show(errorMessage, 2000);
+    });    
+
     return (
         <View style={styles.container}>
             <Button title={'Press me'} onPress={vacancyApi} />
@@ -59,12 +27,12 @@ const App = () => {
             />
             <Text style={{ fontSize: 22 }}>Вакансии:</Text>
             <FlatList
-                keyExtractor={(item) => item}
+                keyExtractor={(item) => item.id}
                 data={results}
                 renderItem={({ item }) => {
                     return <View>
                         <Text style={styles.titleSize}>
-                            {item}
+                            {item.header}
                         </Text>
                     </View>
                 }}
@@ -72,8 +40,6 @@ const App = () => {
         </View>
     );
 };
-
-//<StatusBar style="auto" />
 
 const styles = StyleSheet.create({
     container: {
