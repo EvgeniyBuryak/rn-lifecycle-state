@@ -4,13 +4,7 @@ import zpRu from '../api/zarplataRu';
 export default () => {
     const [onLoader, setOnLoader] = useState(true);
     const [errorMessage, setErrorMessage] = useState('');
-    const [results, setResults] = useState([
-        {
-            id: 0,
-            zp_id: 0,
-            header: ''
-        }
-    ]);
+    const [results, setResults] = useState([]);
 
     const vacancyApi = async () => {
         setOnLoader(true);
@@ -26,20 +20,28 @@ export default () => {
 
             const vacancies = response.data.vacancies;
 
-            vacancies.forEach((vacancy, index) => {
+            /*const updateResults = Array.from(new Set([...results, ...vacancies.map((vacancy, index) => {
+                return {
+                    id: index,
+                    zp_id: vacancy.id,
+                    header: vacancy.header
+                }
+            })]));*/
+            //const length = results.length;
+            //  length += 1;
+            const updateResults = [...results, ...vacancies.map((vacancy, index) => {
 
-                //console.log(index);
-                //console.log(vacancy.id);
+                return {
+                    id: index,
+                    zp_id: vacancy.id,
+                    header: vacancy.header
+                }
+            })];
 
-                setResults([
-                    ...results,
-                    {
-                        id: results.length + 1,
-                        zp_id: vacancy.id,
-                        header: vacancy.header
-                    }                    
-                ]);
-            });
+            console.log(updateResults);
+            setResults(updateResults);
+            //setResults([...results, ...updateResults]);
+
             setErrorMessage('Вакансии успешно загружены');            
         } catch (error) {
             setErrorMessage('Ошибка загрузки вакансии');

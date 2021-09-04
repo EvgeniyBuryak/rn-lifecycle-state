@@ -1,24 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, TextInput, View, FlatList, ActivityIndicator, Button } from 'react-native';
-import Toast, { DURATION } from 'react-native-easy-toast';
 import useResults from './src/hooks/useResults';
+//import ViewToast from './src/components/viewToast';
+import Toast, { DURATION } from 'react-native-easy-toast';
 
 global._toast = '';
 
-const App = () => {    
+const App = function () {    
     const [vacancyApi, results, onLoader, errorMessage] = useResults();
+    //const [toast, setToast] = useState('');
 
     useEffect(() => {
-        console.log(results);
+        //console.log(results);
+        //console.log('456');
         _toast.show(errorMessage, 2000);
+        //console.log('123');
     });    
 
     return (
         <View style={styles.container}>
             <Button title={'Press me'} onPress={vacancyApi} />
             <Toast ref={(toast) => _toast = toast}
-                position='top'
-            />
+                position = 'top'
+            />    
             <ActivityIndicator
                 size="large"
                 color="#0000ff"
