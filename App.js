@@ -12,10 +12,8 @@ const App = function () {
 
     useEffect(() => {
         //console.log(results);
-        //console.log('456');
         _toast.show(errorMessage, 2000);
-        //console.log('123');
-    });    
+    }, [errorMessage]);    
 
     return (
         <View style={styles.container}>
@@ -31,7 +29,7 @@ const App = function () {
             />
             <Text style={{ fontSize: 22 }}>Вакансии:</Text>
             <FlatList
-                keyExtractor={(item) => item.id}
+                keyExtractor={(item) => item.id.toString()}
                 data={results}
                 renderItem={({ item }) => {
                     return <View>
