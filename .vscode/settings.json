@@ -3,7 +3,7 @@
 {
     "editor.formatOnPaste": true,
     "editor.detectIndentation": false,
-    "editor.quickSuggestions": null,
+    "editor.quickSuggestions": false,//null,
     "editor.formatOnSave": true,
     "[typescript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
