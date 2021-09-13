@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import zpRu from '../api/zarplata-ru.api';
 
-export default () => {
+export default () => { // самописный хук (hook)
     const [onLoader, setOnLoader] = useState(true);
     const [errorMessage, setErrorMessage] = useState('');
     const [results, setResults] = useState([]);
