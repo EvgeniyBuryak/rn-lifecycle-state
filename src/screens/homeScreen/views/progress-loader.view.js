@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { View, StyleSheet } from 'react-native';
 import RNProgressLoader from 'rn-progress-loader';
 
-class ProgressLoader extends Component {
+class ProgressLoader extends Component { // компоненты через классы
 
     constructor(props) {
         super(props);
