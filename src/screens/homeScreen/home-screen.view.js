@@ -7,7 +7,6 @@ const wait = (timeout) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
 }
 
-// useResults исчезнет -> перенести в HomeScreen (сделано)
 const App = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const [results, setResults] = useState([]);
@@ -19,7 +18,6 @@ const App = () => {
     const vacancyApi = async () => {
 
         try {
-            // перенести в апи параметры запроса (сделано)
             const response = await request.get('/');
 
             setResults(response.data.vacancies);
@@ -38,22 +36,12 @@ const App = () => {
         wait(2000).then(()=> setRefreshing(false));
     }, []);
 
-    useEffect(() => { // (done)
+    useEffect(() => {
         vacancyApi();
         //if (!onLoader) {
             App._toast.show(errorMessage, 2000);
         //}
     }, [errorMessage]);
-
-    /**
-     * <ActivityIndicator
-                size="large"
-                color="#0000ff"
-                animating={onLoader}
-                hidesWhenStopped={true}
-            />
-     * 
-     */
     
     //<Button title={'Press me'} onPress={vacancyApi} />
 
@@ -66,18 +54,16 @@ const App = () => {
     // hook useCallback для keyExtractor(вынести в отдельную функцию) - 
     // useCallback чтобы функция не пересоздавалась 
     // renderItem туда же в useCallback отдельной функцией
-    /**
-     * <ScrollView
-                refreshControl={
-                    <RefreshControl
-                        refreshing={refreshing}
-                        onRefresh={onRefresh}
-                    />
-                }
-            >
-        </ScrollView>
-     */
-    //console.log(Array.from(results));// results.reduce(console.log));
+    const keyExtractor = useCallback(item => item.id.toString(), []);
+
+    const renderItem = useCallback(({ item }) => {
+        return <View>
+            <Text style={styles.titleSize}>
+                {item.header}
+            </Text>
+        </View>
+    }, []);
+
     return (
         <View style={styles.container}>            
             <Toast ref={(toast) => App._toast = toast}
@@ -85,15 +71,9 @@ const App = () => {
             />            
             <Text style={{ fontSize: 22 }}>Вакансии:</Text>
             <FlatList
-                keyExtractor={(item) => item}
+                keyExtractor={keyExtractor}
                 data={results}
-                renderItem={({ item }) => {
-                    return <View>
-                        <Text style={styles.titleSize}>
-                            {item.header}
-                        </Text>
-                    </View>
-                }}
+                renderItem={renderItem}
                 refreshControl={
                     <RefreshControl
                         refreshing={refreshing}
