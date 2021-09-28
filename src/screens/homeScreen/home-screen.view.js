@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { StyleSheet, Text, View, FlatList, Button, RefreshControl, ScrollView, SafeAreaView } from 'react-native';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { StyleSheet, Text, View, FlatList, RefreshControl } from 'react-native';
 import Toast, { DURATION } from 'react-native-easy-toast';
 import request from '../../api/zarplata-ru.api';
 
@@ -11,11 +11,12 @@ const App = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const [results, setResults] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
+    const inputRef = useRef(null);
 
-    App._toast = undefined; // вспомнить можно ли при стрелочной функции такое?
+    //App._toast = undefined; // вспомнить можно ли при стрелочной функции такое?
     // почитать про useRef -> может стоить заменить App._toast
 
-    const vacancyApi = async () => {
+    const getResults = async () => {
 
         try {
             const response = await request.get('/');
@@ -26,8 +27,6 @@ const App = () => {
 
         } catch (error) {
             setErrorMessage('Ошибка загрузки вакансии');
-        } finally {
-            //setOnLoader(false);
         }
     }
 
@@ -35,27 +34,9 @@ const App = () => {
         setRefreshing(true);
         wait(2000).then(()=> setRefreshing(false));
     }, []);
-
-    useEffect(() => {
-        vacancyApi();
-        //if (!onLoader) {
-            App._toast.show(errorMessage, 2000);
-        //}
-    }, [errorMessage]);
     
-    //<Button title={'Press me'} onPress={vacancyApi} />
-
-    // pull to refresh
-    /**  FlatList - свойство onRefresh тянем и обновляем
-     * параметр котрый нужно передать refreshing 
-     * (done)
-     */
-
-    // hook useCallback для keyExtractor(вынести в отдельную функцию) - 
-    // useCallback чтобы функция не пересоздавалась 
-    // renderItem туда же в useCallback отдельной функцией
     const keyExtractor = useCallback(item => item.id.toString(), []);
-
+    
     const renderItem = useCallback(({ item }) => {
         return <View>
             <Text style={styles.titleSize}>
@@ -64,9 +45,14 @@ const App = () => {
         </View>
     }, []);
 
+    useEffect(() => {
+        getResults();        
+        inputRef.current.show(errorMessage, 2000);
+    }, [errorMessage]);
+    
     return (
         <View style={styles.container}>            
-            <Toast ref={(toast) => App._toast = toast}
+            <Toast ref={inputRef}
                 position='top'
             />            
             <Text style={{ fontSize: 22 }}>Вакансии:</Text>
@@ -80,8 +66,7 @@ const App = () => {
                         onRefresh={onRefresh}
                     />
                 }
-            />
-            
+            />            
         </View>
     );
 };
