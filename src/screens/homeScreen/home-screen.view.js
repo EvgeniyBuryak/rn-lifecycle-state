@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { StyleSheet, Text, View, FlatList, RefreshControl } from 'react-native';
 import Toast, { DURATION } from 'react-native-easy-toast';
-import request from '../../api/zarplata-ru.api';
+import { getVacancies } from '../../api/zarplata-ru.api';
 
 const wait = (timeout) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
@@ -15,20 +15,20 @@ const App = () => {
 
     //App._toast = undefined; // вспомнить можно ли при стрелочной функции такое?
     // почитать про useRef -> может стоить заменить App._toast
-
-    const getResults = async () => {
+    
+    const getResults = () => {
 
         try {
-            const response = await request.get('/');
-
-            setResults(response.data.vacancies);
+            const response = getVacancies();
+            console.log(response);
+            setResults(response);
 
             setErrorMessage('Вакансии успешно загружены');
 
         } catch (error) {
             setErrorMessage('Ошибка загрузки вакансии');
         }
-    }
+    };
 
     const onRefresh = useCallback(()=>{
         setRefreshing(true);
