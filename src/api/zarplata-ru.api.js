@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import axios from 'axios';
 
 const request = axios.create({
@@ -10,20 +11,27 @@ const request = axios.create({
 });
 
 const getVacancies = async () => {
+    const [errorMessage, setErrorMessage] = useState('');
+    const [results, setResults] = useState([]);
+
     try {
-        const response = await request.get('/');
+        const response = await request.get();
 
-        //setResults(response.data.vacancies);
-
-        //setErrorMessage('Вакансии успешно загружены');
-
+        setResults(response.data.vacancies);
+        console.log(response.data.vacancies);
+        setErrorMessage('Вакансии успешно загружены');
         
-
     } catch (error) {
-        //setErrorMessage('Ошибка загрузки вакансии');
-        throw Error('Ошибка');
+        setErrorMessage('Ошибка загрузки вакансии');
+        throw new Error('Ошибка');
+        console.log(error.name);
+        console.log(error.message);
+        console.log(error.stack);
     }
-    return response.data.vacancies;
 }
+const wrapped = () => {
+};
+
 
 export { getVacancies };
+//export default [results, errorMessage];

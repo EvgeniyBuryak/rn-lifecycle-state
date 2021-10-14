@@ -18,16 +18,16 @@ const App = () => {
     
     const getResults = () => {
 
-        try {
-            const response = getVacancies();
-            console.log(response);
-            setResults(response);
+        //try {
+            //getVacancies();
+            //console.log(response);
+            //setResults(response);
 
-            setErrorMessage('Вакансии успешно загружены');
+            //setErrorMessage('Вакансии успешно загружены');
 
-        } catch (error) {
-            setErrorMessage('Ошибка загрузки вакансии');
-        }
+        //} catch (error) {
+            //setErrorMessage('Ошибка загрузки вакансии');
+        //}
     };
 
     const onRefresh = useCallback(()=>{
@@ -46,7 +46,8 @@ const App = () => {
     }, []);
 
     useEffect(() => {
-        getResults();        
+        //getResults();
+        getVacancies();        
         inputRef.current.show(errorMessage, 2000);
     }, [errorMessage]);
     
