@@ -8,27 +8,12 @@ const wait = (timeout) => {
 }
 
 const App = () => {
-    const [errorMessage, setErrorMessage] = useState('');
-    const [results, setResults] = useState([]);
+    const [sendRequest, errorMessage, results] = getVacancies();
     const [refreshing, setRefreshing] = useState(false);
-    const inputRef = useRef(null);
-
+    const toastRef = useRef(null);
+    
     //App._toast = undefined; // вспомнить можно ли при стрелочной функции такое?
     // почитать про useRef -> может стоить заменить App._toast
-    
-    const getResults = () => {
-
-        //try {
-            //getVacancies();
-            //console.log(response);
-            //setResults(response);
-
-            //setErrorMessage('Вакансии успешно загружены');
-
-        //} catch (error) {
-            //setErrorMessage('Ошибка загрузки вакансии');
-        //}
-    };
 
     const onRefresh = useCallback(()=>{
         setRefreshing(true);
@@ -47,13 +32,14 @@ const App = () => {
 
     useEffect(() => {
         //getResults();
-        getVacancies();        
-        inputRef.current.show(errorMessage, 2000);
+        //getVacancies();
+        sendRequest();      
+        toastRef.current.show(errorMessage, 2000);
     }, [errorMessage]);
     
     return (
         <View style={styles.container}>            
-            <Toast ref={inputRef}
+            <Toast ref={toastRef}
                 position='top'
             />            
             <Text style={{ fontSize: 22 }}>Вакансии:</Text>
