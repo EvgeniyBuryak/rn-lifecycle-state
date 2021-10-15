@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import HomeScreenView from '../screens/home-screen/home-screen.view';
 import axios from 'axios';
 
 const getVacancies = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const [results, setResults] = useState([]);
 
-    const sendRequest = async () => {
+    const requestFromApi = async () => {
 
         const requestApiZarplataRu = axios.create({
             baseURL: 'https://api.zp.ru/v1/vacancies',
@@ -20,7 +21,7 @@ const getVacancies = () => {
             const response = await requestApiZarplataRu.get();
 
             setResults(response.data.vacancies);
-            console.log(response.data.vacancies);
+            //console.log(response.data.vacancies);
             setErrorMessage('Вакансии успешно загружены');
             
         } catch (error) {
@@ -34,10 +35,16 @@ const getVacancies = () => {
     }
 
     useEffect(()=>{
-        sendRequest();
+        requestFromApi();
     });
 
-    return [sendRequest, errorMessage, results];
+    //return [sendRequest, errorMessage, results];
+    return (
+        <HomeScreenView
+            results={results}
+            errorMessage={errorMessage}
+        />
+    );
 };
 
 

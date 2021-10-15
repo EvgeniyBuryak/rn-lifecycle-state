@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { StyleSheet, Text, View, FlatList, RefreshControl } from 'react-native';
 import Toast, { DURATION } from 'react-native-easy-toast';
-import { getVacancies } from '../../api/zarplata-ru.api';
+//import { getVacancies } from '../../api/zarplata-ru.api';
 
 const wait = (timeout) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
 }
 
-const App = () => {
-    const [sendRequest, errorMessage, results] = getVacancies();
+const App = ({ results, errorMessage }) => {
+    //const [sendRequest, errorMessage, results] = getVacancies();
     const [refreshing, setRefreshing] = useState(false);
     const toastRef = useRef(null);
-    
+
     //App._toast = undefined; // вспомнить можно ли при стрелочной функции такое?
     // почитать про useRef -> может стоить заменить App._toast
 
@@ -33,7 +33,7 @@ const App = () => {
     useEffect(() => {
         //getResults();
         //getVacancies();
-        sendRequest();      
+        //sendRequest();      
         toastRef.current.show(errorMessage, 2000);
     }, [errorMessage]);
     
