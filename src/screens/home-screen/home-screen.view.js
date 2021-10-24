@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { StyleSheet, Text, View, FlatList, RefreshControl } from 'react-native';
 import Toast, { DURATION } from 'react-native-easy-toast';
-//import { getVacancies } from '../../api/zarplata-ru.api';
+import { getVacancies } from '../../api/zarplata-ru.api';
 
 const wait = (timeout) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
 }
 
-const App = ({ results, errorMessage }) => {
-    //const [sendRequest, errorMessage, results] = getVacancies();
+const HomeScreen = () => {
+    const [errorMessage, setErrorMessage] = useState('');
+    const [results, setResults] = useState([]);    
     const [refreshing, setRefreshing] = useState(false);
     const toastRef = useRef(null);
 
@@ -17,7 +18,12 @@ const App = ({ results, errorMessage }) => {
 
     const onRefresh = useCallback(()=>{
         setRefreshing(true);
+        // вместо того чтобы ждать, нужно обновить запрос к апи
+        // setRefreshing можно в гет
+        // а можно все как через .then
         wait(2000).then(()=> setRefreshing(false));
+
+        // повторить promise.then и async их отличия
     }, []);
     
     const keyExtractor = useCallback(item => item.id.toString(), []);
@@ -30,10 +36,19 @@ const App = ({ results, errorMessage }) => {
         </View>
     }, []);
 
+    const getResults = async () => {
+        try {
+            const result = await getVacancies();
+            // в случае async 
+            setResults(result);
+        } catch (err) {
+            setErrorMessage("Something wrong");
+        }
+    }
+
     useEffect(() => {
-        //getResults();
-        //getVacancies();
-        //sendRequest();      
+        getResults();
+
         toastRef.current.show(errorMessage, 2000);
     }, [errorMessage]);
     
@@ -42,7 +57,7 @@ const App = ({ results, errorMessage }) => {
             <Toast ref={toastRef}
                 position='top'
             />            
-            <Text style={{ fontSize: 22 }}>Вакансии:</Text>
+            <Text style={styles.headerVacancy}>Вакансии:</Text>
             <FlatList
                 keyExtractor={keyExtractor}
                 data={results}
@@ -69,7 +84,10 @@ const styles = StyleSheet.create({
     titleSize: {
         fontSize: 20,
         margin: 5,
+    },
+    headerVacancy: { 
+        fontSize: 22 
     }
 });
 
-export default App;
+export default HomeScreen;
