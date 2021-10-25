@@ -3,10 +3,6 @@ import { StyleSheet, Text, View, FlatList, RefreshControl } from 'react-native';
 import Toast, { DURATION } from 'react-native-easy-toast';
 import { getVacancies } from '../../api/zarplata-ru.api';
 
-const wait = (timeout) => {
-    return new Promise(resolve => setTimeout(resolve, timeout));
-}
-
 const HomeScreen = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const [results, setResults] = useState([]);    
@@ -17,12 +13,14 @@ const HomeScreen = () => {
     // почитать про useRef -> может стоить заменить App._toast
 
     const onRefresh = useCallback(()=>{
-        setRefreshing(true);
+        
+        getResults();
+        
         // вместо того чтобы ждать, нужно обновить запрос к апи
         // setRefreshing можно в гет
         // а можно все как через .then
-        wait(2000).then(()=> setRefreshing(false));
-
+        //wait(2000).then(()=> setRefreshing(false));
+        //setRefreshing(false);
         // повторить promise.then и async их отличия
     }, []);
     
@@ -36,17 +34,33 @@ const HomeScreen = () => {
         </View>
     }, []);
 
-    const getResults = async () => {
+    const getResults = () => {
+        setRefreshing(true);
+
+        let promise = new Promise((resolve, reject) => {
+                const response = getVacancies();
+
+                resolve(response);
+                reject(new Error("Ошибка"));
+            });
+            
+            promise.then((res) => setResults(res))
+            .then(() => setRefreshing(false))
+            .then(() => setErrorMessage("Вакансии загружены"))
+            .catch((err) => setErrorMessage("Something wrong"));
+        /*
         try {
             const result = await getVacancies();
-            // в случае async 
             setResults(result);
+            setRefreshing(false);
+            setErrorMessage("Вакансии загружены");
         } catch (err) {
             setErrorMessage("Something wrong");
-        }
+        } */
     }
 
     useEffect(() => {
+        
         getResults();
 
         toastRef.current.show(errorMessage, 2000);
@@ -56,7 +70,7 @@ const HomeScreen = () => {
         <View style={styles.container}>            
             <Toast ref={toastRef}
                 position='top'
-            />            
+            />
             <Text style={styles.headerVacancy}>Вакансии:</Text>
             <FlatList
                 keyExtractor={keyExtractor}
@@ -68,7 +82,7 @@ const HomeScreen = () => {
                         onRefresh={onRefresh}
                     />
                 }
-            />            
+            />
         </View>
     );
 };
