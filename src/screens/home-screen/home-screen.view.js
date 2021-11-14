@@ -9,45 +9,14 @@ const HomeScreen = () => {
     const [refreshing, setRefreshing] = useState(false);
     const toastRef = useRef(null);
 
-    //App._toast = undefined; // вспомнить можно ли при стрелочной функции такое?
-    // почитать про useRef -> может стоить заменить App._toast
-
-    const onRefresh = useCallback(()=>{
-        
-        getResults();
-        
-        // вместо того чтобы ждать, нужно обновить запрос к апи
-        // setRefreshing можно в гет
-        // а можно все как через .then
-        //wait(2000).then(()=> setRefreshing(false));
-        //setRefreshing(false);
-        // повторить promise.then и async их отличия
-    }, []);
-    
-    const keyExtractor = useCallback(item => item.id.toString(), []);
-    
-    const renderItem = useCallback(({ item }) => {
-        return <View>
-            <Text style={styles.titleSize}>
-                {item.header}
-            </Text>
-        </View>
-    }, []);
-
     const getResults = () => {
         setRefreshing(true);
+        
+        getVacancies().then((res) => setResults(res))
+        .then(() => setRefreshing(false))
+        .then(() => setErrorMessage("Вакансии загружены"))
+        .catch((err) => setErrorMessage("Something wrong"));
 
-        let promise = new Promise((resolve, reject) => {
-                const response = getVacancies();
-
-                resolve(response);
-                reject(new Error("Ошибка"));
-            });
-            
-            promise.then((res) => setResults(res))
-            .then(() => setRefreshing(false))
-            .then(() => setErrorMessage("Вакансии загружены"))
-            .catch((err) => setErrorMessage("Something wrong"));
         /*
         try {
             const result = await getVacancies();
@@ -65,6 +34,19 @@ const HomeScreen = () => {
 
         toastRef.current.show(errorMessage, 2000);
     }, [errorMessage]);
+
+    const handleRefresh = useCallback(()=>{        
+        getResults();
+    }, []);
+    
+    const keyExtractor = useCallback(item => item.id.toString(), []);    
+    const renderItem = useCallback(({ item }) => {
+        return <View>
+            <Text style={styles.titleSize}>
+                {item.header}
+            </Text>
+        </View>
+    }, []);
     
     return (
         <View style={styles.container}>            
@@ -73,13 +55,13 @@ const HomeScreen = () => {
             />
             <Text style={styles.headerVacancy}>Вакансии:</Text>
             <FlatList
-                keyExtractor={keyExtractor}
                 data={results}
+                keyExtractor={keyExtractor}
                 renderItem={renderItem}
                 refreshControl={
                     <RefreshControl
                         refreshing={refreshing}
-                        onRefresh={onRefresh}
+                        onRefresh={handleRefresh}
                     />
                 }
             />
@@ -92,8 +74,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
         alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: 50,
+        justifyContent: 'center',        
     },
     titleSize: {
         fontSize: 20,
