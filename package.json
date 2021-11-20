@@ -7,7 +7,7 @@
     "web": "expo start --web",
     "eject": "expo eject"
   },
-  "dependencies": {    
+  "dependencies": {
     "@react-native-community/masked-view": "^0.1.10",
     "axios": "^0.21.1",
     "expo": "~42.0.1",

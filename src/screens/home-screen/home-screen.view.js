@@ -1,70 +1,50 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { StyleSheet, Text, View, FlatList, RefreshControl } from 'react-native';
-import Toast, { DURATION } from 'react-native-easy-toast';
+import { StyleSheet, Text, View } from 'react-native';
 import { getVacancies } from '../../api/zarplata-ru.api';
+import { ResultsList } from '../home-screen/views/results-list.view';
+import Toast, {DURATION} from 'react-native-easy-toast';
 
 const HomeScreen = () => {
-    const [errorMessage, setErrorMessage] = useState('');
-    const [results, setResults] = useState([]);    
+    const [results, setResults] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
     const toastRef = useRef(null);
 
-    const getResults = () => {
+    const getResults = async () => {
         setRefreshing(true);
         
-        getVacancies().then((res) => setResults(res))
-        .then(() => setRefreshing(false))
-        .then(() => setErrorMessage("Вакансии загружены"))
-        .catch((err) => setErrorMessage("Something wrong"));
-
-        /*
         try {
             const result = await getVacancies();
-            setResults(result);
-            setRefreshing(false);
-            setErrorMessage("Вакансии загружены");
+
+            setResults(result);            
         } catch (err) {
-            setErrorMessage("Something wrong");
-        } */
+            toastRef.current.show("Something wrong", 2000);
+        } finally {
+            setRefreshing(false);
+        }        
+
+        /*
+        getVacancies().then((res) => setResults(res))
+        .then(() => setRefreshing(false))
+        .then(() => setToastMessage("Вакансии загружены"))
+        .catch((err) => setToastMessage("Something wrong"));
+        */
     }
 
-    useEffect(() => {
-        
-        getResults();
-
-        toastRef.current.show(errorMessage, 2000);
-    }, [errorMessage]);
+    useEffect(() => {       
+        getResults();       
+    }, []);
 
     const handleRefresh = useCallback(()=>{        
         getResults();
     }, []);
-    
-    const keyExtractor = useCallback(item => item.id.toString(), []);    
-    const renderItem = useCallback(({ item }) => {
-        return <View>
-            <Text style={styles.titleSize}>
-                {item.header}
-            </Text>
-        </View>
-    }, []);
-    
+
     return (
-        <View style={styles.container}>            
+        <View style={styles.container}>
             <Toast ref={toastRef}
                 position='top'
             />
             <Text style={styles.headerVacancy}>Вакансии:</Text>
-            <FlatList
-                data={results}
-                keyExtractor={keyExtractor}
-                renderItem={renderItem}
-                refreshControl={
-                    <RefreshControl
-                        refreshing={refreshing}
-                        onRefresh={handleRefresh}
-                    />
-                }
-            />
+            <ResultsList results={results} refreshing={refreshing} onRefresh={handleRefresh}/>
         </View>
     );
 };
@@ -76,11 +56,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',        
     },
-    titleSize: {
-        fontSize: 20,
-        margin: 5,
-    },
     headerVacancy: { 
+        top: 20,
+        margin: 15,
         fontSize: 22 
     }
 });
